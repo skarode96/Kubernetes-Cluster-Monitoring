@@ -5,8 +5,13 @@ app = Flask(__name__)
 
 packets = []
 
-@app.route('/api/packets', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
+    packets.clear()
+    return jsonify({'Hello':'World'}), 200
+
+@app.route('/api/packets', methods=['GET'])
+def get_packets():
     response = packets.copy()
     packets.clear()
     return jsonify({'packets': response}), 200
@@ -24,4 +29,4 @@ def create_task():
     return jsonify({'status': 'OK'}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    app.run(debug=True, host='0.0.0.0')
