@@ -37,7 +37,7 @@ spec:
           ports:
             - containerPort: 80
         - name: shell
-          image: "packets-api"
+          image: "packets-api:latest"
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
