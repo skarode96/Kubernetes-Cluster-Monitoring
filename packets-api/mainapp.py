@@ -8,7 +8,7 @@ packets = []
 @app.route('/', methods=['GET'])
 def index():
     packets.clear()
-    return jsonify({'Hello':'World'}), 200
+    return jsonify({'health':'up'}), 200
 
 @app.route('/api/packets', methods=['GET'])
 def get_packets():
