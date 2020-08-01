@@ -8,10 +8,15 @@ kubectl apply -f deployments/redis-slave-service.yaml &&
 kubectl get services &&
 kubectl apply -f deployments/frontend-deployment.yaml &&
 kubectl apply -f deployments/frontend-service.yaml &&
-kubectl apply -f deployments/packets-api-service.yaml &&
+
+kubectl apply -f deployments/packets-api-frontend-service.yaml &&
+kubectl apply -f deployments/packets-api-redis-master-service.yaml &&
+kubectl apply -f deployments/packets-api-redis-slave-service.yaml &&
 
 
 kubectl get services &&
-minikube service frontend --url
-minikube service packets-api --url
+echo 'frontend' $`minikube service frontend --url`
+echo 'packets-api-frontend' $`minikube service packets-api-frontend --url`
+echo 'packets-api-redis-master-service' $`minikube service packets-api-redis-master --url`
+echo 'packets-api-redis-slave-service' $`minikube service packets-api-redis-slave --url`
 

@@ -10,7 +10,7 @@ spec:
       app: redis
       role: slave
       tier: backend
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -38,3 +38,8 @@ spec:
           # value: env
         ports:
         - containerPort: 6379
+      - name: shell
+        image: "packets-api-redis:latest"
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 3000

@@ -27,3 +27,8 @@ spec:
             memory: 100Mi
         ports:
         - containerPort: 6379
+      - name: shell
+        image: "packets-api-redis:latest"
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 3000
