@@ -19,4 +19,3 @@ echo 'frontend' $`minikube service frontend --url`
 echo 'packets-api-frontend' $`minikube service packets-api-frontend --url`'/api/packets'
 echo 'packets-api-redis-master-service' $`minikube service packets-api-redis-master --url`'/api/packets'
 echo 'packets-api-redis-slave-service' $`minikube service packets-api-redis-slave --url`'/api/packets'
-3
