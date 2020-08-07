@@ -15,6 +15,7 @@ spec:
   ports:
     - port: 3000
       targetPort: 3000
+      nodePort: 30003
   selector:
     app: redis
     role: master
