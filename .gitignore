@@ -1,3 +1,5 @@
 /.idea
 venv
 __pycache__
+monitoring/client/node_modules
+monitoring/server/node_modules
