@@ -7,6 +7,8 @@ export default class AreaChartComponent extends PureComponent {
   render() {
     return (
       <React.Fragment>
+
+
         <AreaChart width={730} height={250} data={this.props.plotDataFrontend}
                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <defs>
@@ -29,6 +31,9 @@ export default class AreaChartComponent extends PureComponent {
           <Tooltip />
           <Area type="monotone" dataKey="frontend" stroke="red" fillOpacity={1} fill="url(#colorRed)" animationDuration={0.1} />
         </AreaChart>
+        <h3 className="header" style={{textAlign: "center"}}>Frontend Side Car Monitor</h3>
+        <br/>
+        <br/>
 
         <AreaChart width={730} height={250} data={this.props.plotDataRedisMaster}
                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -38,6 +43,9 @@ export default class AreaChartComponent extends PureComponent {
           <Tooltip />
           <Area type="monotone" dataKey="redisMaster" stroke="green" fillOpacity={1} fill="url(#colorGreen)" animationDuration={0.1} />
         </AreaChart>
+        <h3 className="header" style={{textAlign: "center"}}>Redis Master Side Car Monitor</h3>
+        <br/>
+        <br/>
 
         <AreaChart width={730} height={250} data={this.props.plotDataRedisSlave}>
           <XAxis dataKey="timestamp" />
@@ -46,7 +54,9 @@ export default class AreaChartComponent extends PureComponent {
           <Tooltip />
           <Area type="monotone" dataKey="redisSlave" stroke="blue" fillOpacity={1} fill="url(#colorBlue)" animationDuration={0.1} />
         </AreaChart>
-
+        <h3 className="header" style={{textAlign: "center"}}>Redis Slave Side Car Monitor</h3>
+        <br/>
+        <br/>
       </React.Fragment>
     );
   }

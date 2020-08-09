@@ -1,7 +1,32 @@
-import React, {Component} from 'react';
-import {getInitialData} from './DataProvider';
+import React, {Component, useState} from 'react';
+import {getInitialData, getPackets} from './DataProvider';
 import AreaChartComponent from './AreaChartComponent';
-import 'react-table/react-table.css';
+import Button from 'react-bootstrap/Button';
+import Toast from 'react-bootstrap/Toast';
+import Container from "react-bootstrap/Container";
+import Jumbotron from "react-bootstrap/Jumbotron";
+import Navbar from "react-bootstrap/Navbar";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Table from "react-bootstrap/Table";
+import PacketsTableComponent from "./PacketsTableComponent";
+
+
+const ExampleToast = ({ children }) => {
+  const [show, toggleShow] = useState(true);
+
+  return (
+      <React.Fragment>
+        {!show && <Button onClick={() => toggleShow(true)}>Show Toast</Button>}
+        <Toast show={show} onClose={() => toggleShow(false)}>
+          <Toast.Header>
+            <strong className="mr-auto">React-Bootstrap</strong>
+          </Toast.Header>
+          <Toast.Body>{children}</Toast.Body>
+        </Toast>
+      </React.Fragment>
+  );
+};
 
 class App extends Component {
 
@@ -10,7 +35,9 @@ class App extends Component {
     this.state = {
       plotDataFrontend: getInitialData(),
       plotDataRedisMaster: getInitialData(),
-      plotDataRedisSlave:getInitialData()};
+      plotDataRedisSlave:getInitialData(),
+        packets: getPackets()
+    };
   }
 
   componentDidMount() {
@@ -24,22 +51,21 @@ class App extends Component {
     //                                                       .reduce((init, packet) => init.concat(packet), []);
     plotDataArg.state.packets.filter(packet => packet.payload.dstPort=== 22).map(packet => console.log("SSH packet ",packet));
     plotDataArg.state.packets.filter(packet => packet.payload.payload.indexOf("token") !== -1).map(packet => console.log("Token packet ",packet));
-
-    console.log(plotDataArg.state.packets);
+    plotDataArg.state.packets.filter(packet => packet.payload.dstPort == 443).map(packet => console.log('Token packet', packet));
 
       if(plotDataArg.id === 'frontend') {
-        let newPlotDataFrontend = this.state.plotDataFrontend.concat({timestamp: Date.now(),
-          frontend: plotDataArg.state.packets.length});
+        let newPlotDataFrontend = this.state.plotDataFrontend.concat({timestamp: new Date().toLocaleTimeString(),
+          frontend: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
           newPlotDataFrontend= newPlotDataFrontend.slice(Math.max(newPlotDataFrontend.length - 30, 0));
           this.setState(Object.assign({}, {plotDataFrontend: newPlotDataFrontend}));
       } else if(plotDataArg.id === 'redisMaster') {
-        let newPlotDataRedisMaster= this.state.plotDataRedisMaster.concat({timestamp: Date.now(),
-          redisMaster: plotDataArg.state.packets.length});
+        let newPlotDataRedisMaster= this.state.plotDataRedisMaster.concat({timestamp: new Date().toLocaleTimeString(),
+          redisMaster: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
           newPlotDataRedisMaster= newPlotDataRedisMaster.slice(Math.max(newPlotDataRedisMaster.length - 30, 0));
           this.setState(Object.assign({}, {plotDataRedisMaster: newPlotDataRedisMaster}));
       } else {
-        let newPlotDataRedisSlave = this.state.plotDataRedisSlave.concat({timestamp: Date.now(),
-          redisSlave: plotDataArg.state.packets.length});
+        let newPlotDataRedisSlave = this.state.plotDataRedisSlave.concat({timestamp:new Date().toLocaleTimeString(),
+          redisSlave: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
         newPlotDataRedisSlave= newPlotDataRedisSlave.slice(Math.max(newPlotDataRedisSlave.length - 30, 0));
         this.setState(Object.assign({}, {plotDataRedisSlave: newPlotDataRedisSlave}));
       }
@@ -51,6 +77,9 @@ class App extends Component {
   }
 
   startUpdates() {
+    if(this.eventSource  !== undefined) {
+        this.eventSource.close();
+    }
     this.eventSource = new EventSource('http://localhost:5000/events');
     this.eventSource.addEventListener('packets', (e) => this.updatePlotData(JSON.parse(e.data)));
     this.eventSource.addEventListener('closedConnection', () => this.stopUpdates());
@@ -58,13 +87,41 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <button onClick={() => this.startUpdates()}>Start updates</button>
-        <button onClick={() => this.stopUpdates()}>Stop updates</button>
-        <AreaChartComponent plotDataFrontend={this.state.plotDataFrontend}
-                            plotDataRedisMaster={this.state.plotDataRedisMaster}
-                            plotDataRedisSlave={this.state.plotDataRedisSlave}/>
-      </div>
+        <React.Fragment>
+        <Container>
+          <Jumbotron>
+            <h1 className="header" style={{textAlign: "center"}}>Kubernetes Monitoring Dashboard</h1>
+          </Jumbotron>
+        </Container>
+        <Container>
+            <Row className="justify-content-md-center">
+                <Col xs lg="4"/>
+                <Col xs lg="2">
+                    <Button onClick={() => this.startUpdates()}>Start updates</Button>
+                </Col>
+                <Col xs lg="2">
+                    <Button onClick={() => this.stopUpdates()}>Stop updates</Button>
+                </Col>
+                <Col xs lg="4"/>
+            </Row>
+            <Row  className="justify-content-md-center">
+                <Col xs lg="8">
+
+                    <AreaChartComponent plotDataFrontend={this.state.plotDataFrontend}
+                                        plotDataRedisMaster={this.state.plotDataRedisMaster}
+                                        plotDataRedisSlave={this.state.plotDataRedisSlave}/>
+                </Col>
+                <Col xs lg="4">
+
+                </Col>
+            </Row>
+            <Row>
+                {this.state.plotDataFrontend.packets && <PacketsTableComponent packets={this.state.plotDataFrontend.packets}/>}
+            </Row>
+
+        </Container>
+        </React.Fragment>
+
     );
   }
 }

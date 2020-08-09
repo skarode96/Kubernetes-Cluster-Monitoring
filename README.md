@@ -35,3 +35,10 @@ activate minikube's docker env before running any docker build command
 ```
   eval $(minikube docker-env) 
 ```
+
+```
+curl -ik \
+     -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+     https://kubernetes.default.svc.cluster.local/api/v1/namespaces/default/pods
+```
+
