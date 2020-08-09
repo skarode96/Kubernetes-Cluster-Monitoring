@@ -48,37 +48,49 @@ class App extends Component {
 
   updatePlotData(plotDataArg) {
 
-    plotDataArg.state.packets = plotDataArg.state.packets
-                                                        .filter(packet => packet.payload.payload.indexOf("options=[('NOP', None), ('NOP', None)")=== -1)
-                                                          .reduce((init, packet) => init.concat(packet), []);
+    // plotDataArg.state.packets = plotDataArg.state.packets
+    //                                             .filter(packet => packet.payload.payload.indexOf("options=[('NOP', None), ('NOP', None)")=== -1)
+    //                                             .reduce((init, packet) => init.concat(packet), []);
       this.sniffSSHPackets(plotDataArg);
       this.sniffTokenPackets(plotDataArg);
 
-      let newPlotDataFrontend = this.state.plotDataFrontend.concat({timestamp: new Date().toLocaleTimeString(),
-          frontend: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
-      newPlotDataFrontend= newPlotDataFrontend.slice(Math.max(newPlotDataFrontend.length - 30, 0));
-      this.setState(Object.assign({}, {plotDataFrontend: newPlotDataFrontend}));
-
-    plotDataArg.state.packets.filter(packet => packet.payload.dstPort == 443).map(packet => console.log('Token packet', packet));
-
       if(plotDataArg.id === 'frontend') {
-        let newPlotDataFrontend = this.state.plotDataFrontend.concat({timestamp: new Date().toLocaleTimeString(),
-          frontend: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
-          newPlotDataFrontend= newPlotDataFrontend.slice(Math.max(newPlotDataFrontend.length - 30, 0));
-          this.setState(Object.assign({}, {plotDataFrontend: newPlotDataFrontend}));
+          this.appendFrontendPackets(plotDataArg);
       } else if(plotDataArg.id === 'redisMaster') {
-        let newPlotDataRedisMaster= this.state.plotDataRedisMaster.concat({timestamp: new Date().toLocaleTimeString(),
-          redisMaster: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
-          newPlotDataRedisMaster= newPlotDataRedisMaster.slice(Math.max(newPlotDataRedisMaster.length - 30, 0));
-          this.setState(Object.assign({}, {plotDataRedisMaster: newPlotDataRedisMaster}));
+          this.appendRedisMasterPackets(plotDataArg);
       } else {
-        let newPlotDataRedisSlave = this.state.plotDataRedisSlave.concat({timestamp:new Date().toLocaleTimeString(),
-          redisSlave: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
-        newPlotDataRedisSlave= newPlotDataRedisSlave.slice(Math.max(newPlotDataRedisSlave.length - 30, 0));
-        this.setState(Object.assign({}, {plotDataRedisSlave: newPlotDataRedisSlave}));
+          this.appendRedisSlavePackets(plotDataArg);
       }
   }
 
+
+    appendRedisSlavePackets(plotDataArg) {
+        let newPlotDataRedisSlave = this.state.plotDataRedisSlave.concat({
+            timestamp: new Date().toLocaleTimeString(),
+            redisSlave: plotDataArg.state.packets.length, packets: plotDataArg.state.packets
+        });
+        newPlotDataRedisSlave = newPlotDataRedisSlave.slice(Math.max(newPlotDataRedisSlave.length - 30, 0));
+        this.setState(Object.assign({}, {plotDataRedisSlave: newPlotDataRedisSlave}));
+    }
+
+    appendRedisMasterPackets(plotDataArg) {
+        let newPlotDataRedisMaster = this.state.plotDataRedisMaster.concat({
+            timestamp: new Date().toLocaleTimeString(),
+            redisMaster: plotDataArg.state.packets.length, packets: plotDataArg.state.packets
+        });
+        newPlotDataRedisMaster = newPlotDataRedisMaster.slice(Math.max(newPlotDataRedisMaster.length - 30, 0));
+        this.setState(Object.assign({}, {plotDataRedisMaster: newPlotDataRedisMaster}));
+    }
+
+    appendFrontendPackets(plotDataArg) {
+        let newPlotDataFrontend = this.state.plotDataFrontend.concat({
+            timestamp: new Date().toLocaleTimeString(),
+
+            frontend: plotDataArg.state.packets.length, packets: plotDataArg.state.packets
+        });
+        newPlotDataFrontend = newPlotDataFrontend.slice(Math.max(newPlotDataFrontend.length - 30, 0));
+        this.setState(Object.assign({}, {plotDataFrontend: newPlotDataFrontend}));
+    }
 
     sniffTokenPackets(plotDataArg) {
         let tokenPackets = plotDataArg.state.packets
