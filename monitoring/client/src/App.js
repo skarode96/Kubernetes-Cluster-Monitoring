@@ -8,6 +8,8 @@ import Jumbotron from "react-bootstrap/Jumbotron";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import PacketsTableComponent from "./PacketsTableComponent";
+import Tabs from "react-bootstrap/Tabs";
+import Tab from "react-bootstrap/Tab";
 
 
 const ExampleToast = ({ children }) => {
@@ -30,11 +32,13 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      plotDataFrontend: getInitialData(),
-      plotDataRedisMaster: getInitialData(),
-      plotDataRedisSlave:getInitialData(),
-        packets: []
+      let initialData = getInitialData();
+      this.state = {
+      plotDataFrontend: initialData,
+      plotDataRedisMaster: initialData,
+      plotDataRedisSlave:initialData,
+      sshPackets: initialData,
+      tokenPackets: initialData
     };
   }
 
@@ -44,11 +48,17 @@ class App extends Component {
 
   updatePlotData(plotDataArg) {
 
-    // plotDataArg.state.packets = plotDataArg.state.packets
-    //                                                     .filter(packet => packet.payload.payload.indexOf("options=[('NOP', None), ('NOP', None)")=== -1)
-    //                                                       .reduce((init, packet) => init.concat(packet), []);
-    plotDataArg.state.packets.filter(packet => packet.payload.dstPort=== 22).map(packet => console.log("SSH packet ",packet));
-    plotDataArg.state.packets.filter(packet => packet.payload.payload.indexOf("token") !== -1).map(packet => console.log("Token packet ",packet));
+    plotDataArg.state.packets = plotDataArg.state.packets
+                                                        .filter(packet => packet.payload.payload.indexOf("options=[('NOP', None), ('NOP', None)")=== -1)
+                                                          .reduce((init, packet) => init.concat(packet), []);
+      this.sniffSSHPackets(plotDataArg);
+      this.sniffTokenPackets(plotDataArg);
+
+      let newPlotDataFrontend = this.state.plotDataFrontend.concat({timestamp: new Date().toLocaleTimeString(),
+          frontend: plotDataArg.state.packets.length, packets: plotDataArg.state.packets});
+      newPlotDataFrontend= newPlotDataFrontend.slice(Math.max(newPlotDataFrontend.length - 30, 0));
+      this.setState(Object.assign({}, {plotDataFrontend: newPlotDataFrontend}));
+
     plotDataArg.state.packets.filter(packet => packet.payload.dstPort == 443).map(packet => console.log('Token packet', packet));
 
       if(plotDataArg.id === 'frontend') {
@@ -70,7 +80,25 @@ class App extends Component {
   }
 
 
-  stopUpdates() {
+    sniffTokenPackets(plotDataArg) {
+        let tokenPackets = plotDataArg.state.packets
+            .filter(packet => packet.payload.dstPort === 443).reduce((a,b) => a.concat({timestamp: new Date().toLocaleTimeString(), packets: b}), []);
+        let packets = this.state.tokenPackets.concat(tokenPackets);
+        packets= packets.slice(Math.max(tokenPackets.length - 30, 0));
+        this.setState(Object.assign({}, {tokenPackets: packets}));
+        return packets;
+    }
+
+    sniffSSHPackets(plotDataArg) {
+        let sshPackets = plotDataArg.state.packets
+            .filter(packet => packet.payload.dstPort === 22).reduce((a,b) => a.concat({timestamp: new Date().toLocaleTimeString(), packets: b}), []);
+        let packets = this.state.sshPackets.concat(sshPackets);
+        packets= packets.slice(Math.max(sshPackets.length - 30, 0));
+        this.setState(Object.assign({}, {sshPackets: packets}));
+        return packets;
+    }
+
+    stopUpdates() {
     this.eventSource.close();
   }
 
@@ -109,14 +137,25 @@ class App extends Component {
                                         plotDataRedisMaster={this.state.plotDataRedisMaster}
                                         plotDataRedisSlave={this.state.plotDataRedisSlave}/>
                 </Col>
-                <Col xs lg="4">
-
-                </Col>
-            </Row>
-            <Row>
-                {this.state.plotDataFrontend && <PacketsTableComponent packets={this.state.plotDataFrontend}/>}
             </Row>
 
+            <Tabs defaultActiveKey="Frontend" id="uncontrolled-tab-example">
+                <Tab eventKey="Frontend" title="Frontend">
+                    {this.state.plotDataFrontend && <PacketsTableComponent packets={this.state.plotDataFrontend}/>}
+                </Tab>
+                <Tab eventKey="Redis Master" title="Redis Master">
+                    {this.state.plotDataRedisMaster && <PacketsTableComponent packets={this.state.plotDataRedisMaster}/>}
+                </Tab>
+                <Tab eventKey="Redis Slave" title="Redis Slave">
+                    {this.state.plotDataRedisSlave && <PacketsTableComponent packets={this.state.plotDataRedisSlave}/>}
+                </Tab>
+                <Tab eventKey="SSH Attack" title="SSH Attack">
+                    {this.state.plotDataRedisSlave && <PacketsTableComponent packets={this.state.sshPackets}/>}
+                </Tab>
+                <Tab eventKey="Token Over Wire" title="Token Over Wire">
+                    {this.state.plotDataRedisSlave && <PacketsTableComponent packets={this.state.tokenPackets}/>}
+                </Tab>
+            </Tabs>
         </Container>
         </React.Fragment>
 

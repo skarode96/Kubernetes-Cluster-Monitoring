@@ -42,3 +42,33 @@ export function getInitialData() {
     }
   ];
 }
+
+export function getColumnNames() {
+  return [
+    {
+      name: 'Timestamp',
+      selector: 'timestamp',
+      sortable: true
+    },
+    {
+      name: 'Destination IP',
+      selector: 'dstIP'
+    },
+    {
+      name: 'Destination Port',
+      selector: 'dstPort',
+      sortable: true
+    },
+    {
+      name: 'Size',
+      selector: 'size',
+      sortable: true
+    },
+    {
+      name: 'Source IP',
+      selector: 'srcIP',
+      sortable: true
+    }
+
+  ];
+}

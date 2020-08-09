@@ -1,6 +1,7 @@
 import React from "react";
 import DataTable from "react-data-table-component";
 import Card from "react-bootstrap/Card";
+import {getColumnNames} from "./DataProvider";
 
 
 export default class PacketsTableComponent extends React.Component{
@@ -11,33 +12,7 @@ export default class PacketsTableComponent extends React.Component{
                                         .reduce((p1, p2) => p1.concat(p2), [])
                                         .map(packet => packet.payload)
                                         .reduce((p1, p2) => p1.concat(p2), []);
-        const columns = [
-            {
-                name: 'Timestamp',
-                selector: 'timestamp',
-                sortable: true
-            },
-            {
-                name: 'Destination IP',
-                selector: 'dstIP'
-            },
-            {
-                name: 'Destination Port',
-                selector: 'dstPort',
-                sortable: true
-            },
-            {
-                name: 'Size',
-                selector: 'size',
-                sortable: true
-            },
-            {
-                name: 'Source IP',
-                selector: 'srcIP',
-                sortable: true
-            }
-
-        ];
+        const columns = getColumnNames();
 
         const ExpandableComponent = ({ data }) => <Card style={{ width: '70rem' }}>
             <Card.Body>{data.payload}</Card.Body>
