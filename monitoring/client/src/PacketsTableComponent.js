@@ -6,7 +6,11 @@ import Card from "react-bootstrap/Card";
 export default class PacketsTableComponent extends React.Component{
 
     render() {
-        const data = this.props.packets.map(packet => packet.payload).reduce((p1,p2) => p1.concat(p2), []);
+        const data = this.props.packets.filter(packet => packet.packets.length !== 0)
+                                        .map(packet => packet.packets)
+                                        .reduce((p1, p2) => p1.concat(p2), [])
+                                        .map(packet => packet.payload)
+                                        .reduce((p1, p2) => p1.concat(p2), []);
         const columns = [
             {
                 name: 'Timestamp',

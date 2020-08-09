@@ -1,14 +1,12 @@
 import React, {Component, useState} from 'react';
-import {getInitialData, getPackets} from './DataProvider';
+import {getInitialData} from './DataProvider';
 import AreaChartComponent from './AreaChartComponent';
 import Button from 'react-bootstrap/Button';
 import Toast from 'react-bootstrap/Toast';
 import Container from "react-bootstrap/Container";
 import Jumbotron from "react-bootstrap/Jumbotron";
-import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Table from "react-bootstrap/Table";
 import PacketsTableComponent from "./PacketsTableComponent";
 
 
@@ -36,7 +34,7 @@ class App extends Component {
       plotDataFrontend: getInitialData(),
       plotDataRedisMaster: getInitialData(),
       plotDataRedisSlave:getInitialData(),
-        packets: getPackets()
+        packets: []
     };
   }
 
@@ -116,7 +114,7 @@ class App extends Component {
                 </Col>
             </Row>
             <Row>
-                {this.state.plotDataFrontend.packets && <PacketsTableComponent packets={this.state.plotDataFrontend.packets}/>}
+                {this.state.plotDataFrontend && <PacketsTableComponent packets={this.state.plotDataFrontend}/>}
             </Row>
 
         </Container>
