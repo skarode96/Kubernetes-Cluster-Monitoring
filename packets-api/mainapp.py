@@ -18,7 +18,7 @@ def get_packets():
 
 
 @app.route('/api/packets', methods=['POST'])
-def create_task():
+def post_packets():
     if not request.json:
         abort(400)
     packet = {
