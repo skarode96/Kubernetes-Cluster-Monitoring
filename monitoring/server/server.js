@@ -44,29 +44,27 @@ function sendEvents(response, eventHistory) {
       services.forEach(service => {
         fetch(service.url,{
           mode: "no-cors"})
-            .then((r) => r.json())
-            .then((r) => {
-              const res = 'id: ' + service.id.toString() + '\nevent: packets\ndata: {"id": "'+ service.id.toString() +'" , "state": '+ JSON.stringify(r) +'}\n\n';
-              response.write(res);
-              packets = packets.concat(r.packets.map(packet => packet.payload).reduce((a, b) => a.concat(b),[]));
-            });
-        // save_training_packets();
+          .then((r) => r.json())
+          .then((r) => {
+            const res = 'id: ' + service.id.toString() + '\nevent: packets\ndata: {"id": "'+ service.id.toString() +'" , "state": '+ JSON.stringify(r) +'}\n\n';
+            response.write(res);
+            packets = packets.concat(r.packets.map(packet => packet.payload).reduce((a, b) => a.concat(b),[]));
+          });
+        console.log(packets.length);
+        if(packets.length > 1000) {
+          fs.writeFile("./training_data.js", JSON.stringify(packets), function(err) {
+            if(err) {
+              console.log(err);
+            }
+            else {
+              console.log("Output saved to /training_data.js");
+            }
+          });
+        }
       });
     }
   }, 3000);
 
-}
-
-function save_training_packets() {
-  if (packets.length > 10000) {
-    fs.writeFile("ML/training_data.js", JSON.stringify(packets), function (err) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Output saved to ML/training_data.js");
-      }
-    });
-  }
 }
 
 function closeConnection(response) {

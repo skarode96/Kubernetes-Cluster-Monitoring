@@ -2,20 +2,21 @@
 const brain = require('brain.js');
 const fs = require('fs');
 
-const input = { L4protocol: null,
-    L7protocol: 'TCP',
-    dstIP: '10.96.0.1',
-    dstMAC: '02:42:ce:b4:e9:2b',
-    dstPort: 443,
-    owner: 'test',
-    payload:
-        '<IP  version=4 ihl=5 tos=0x0 len=40 id=0 flags=DF frag=0 ttl=64 proto=tcp chksum=0x8456 src=172.17.0.8 dst=10.96.0.1 |<TCP  sport=44294 dport=https seq=3696699395 ack=0 dataofs=5 reserved=0 flags=R window=0 chksum=0x464a urgptr=0 |>>',
-    size: 54,
-    srcIP: '172.17.0.8',
-    srcMAC: '02:42:ac:11:00:08',
-    srcPort: 44294,
-    timestamp: 1597072747,
-    ttl: 64 }
+const input = {
+    "L4protocol": null,
+    "L7protocol": "TCP",
+    "dstIP": "172.17.0.8",
+    "dstMAC": "02:42:ac:11:00:08",
+    "dstPort": 3000,
+    "owner": "test",
+    "payload": "<IP  version=4 ihl=5 tos=0x0 len=60 id=46152 flags=DF frag=0 ttl=63 proto=tcp chksum=0x2f48 src=172.17.0.1 dst=172.17.0.8 |<TCP  sport=54732 dport=3000 seq=1063891534 ack=0 dataofs=10 reserved=0 flags=S window=64240 chksum=0x585a urgptr=0 options=[('MSS', 1460), ('SAckOK', b''), ('Timestamp', (4207737050, 0)), ('NOP', None), ('WScale', 7)] |>>",
+    "size": 74,
+    "srcIP": "172.17.0.1",
+    "srcMAC": "02:42:52:84:be:96",
+    "srcPort": 54732,
+    "timestamp": 1597017089,
+    "ttl": 63
+}
 
 async function main() {
 
@@ -24,7 +25,6 @@ async function main() {
             return console.log(err);
         }
         data = JSON.parse(data);
-
         const net = new brain.NeuralNetwork().fromJSON(data);
         let result = net.run(map(input));
         console.log(result);

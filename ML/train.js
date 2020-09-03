@@ -9,7 +9,6 @@ async function main() {
                 return console.log(err);
             }
             data = JSON.parse(data);
-            data  = data.slice(0,5000);
 
             let mapped_data = transformInputData(data);
 
@@ -31,17 +30,12 @@ function map(packet) {
     return {size: packet.size, srcPort: packet.srcPort, dstPort: packet.dstPort}
 }
 
-
 function transformInputData(data) {
     return data.map(packet => {
-        if (packet.dstPort === 22 || packet.dstPort === 443) {
+        if (packet.dstPort === 22 || packet.dstPort === 443)
             return {input: map(packet), output: {attack: 1, safe: 0}};
-        }
-
-        else {
-            packet.blacklist = false;
+        else
             return {input: map(packet), output: {attack: 0, safe: 1}};
-        }
     }).reduce((a, b) => a.concat(b), []);
 }
 
